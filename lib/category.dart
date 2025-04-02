@@ -170,9 +170,10 @@ class _categoryState extends State<category> {
             Expanded(
               child: GridView.count(
                 padding: EdgeInsets.all(8),
-                crossAxisCount: 2,
+                crossAxisCount: 3,
                 mainAxisSpacing: 8,
                 crossAxisSpacing: 8,
+                childAspectRatio: 0.8,
                 children:
                     getFilterRooms().map((room) {
                       return ClipRRect(
