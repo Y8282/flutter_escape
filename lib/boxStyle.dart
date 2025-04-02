@@ -4,11 +4,11 @@ class TextFieldStyle extends StatelessWidget {
   final String hintText;
   final IconData prefixIcon;
   final IconData? suffixIcon;
-  final VoidCallback? onTap;  
+  final VoidCallback? onTap;
   final bool obscureText;
   final TextEditingController controller;
   final bool autofocus;
-  
+  final Function(String)? onChanged;
 
   const TextFieldStyle({
     super.key,
@@ -19,31 +19,38 @@ class TextFieldStyle extends StatelessWidget {
     this.obscureText = false,
     this.onTap,
     this.autofocus = false,
-  
+    this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-                      child: TextField(
-                        obscureText: obscureText,
-                        autofocus: autofocus,
-                        controller: controller,
-                        decoration: InputDecoration(
-                          hintText: hintText,
-                          prefixIcon: Icon(prefixIcon),
-                          suffixIcon: controller.text.isNotEmpty ? IconButton(onPressed: ()=> controller.clear(), icon: Icon(Icons.clear),):null,
-                          fillColor: Colors.white,
-                          filled: true,
-                          labelStyle: TextStyle(color: Colors.black),
-                          focusedBorder: OutlineInputBorder(),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.grey),
-                          ),
-                        ),
-                        onSubmitted: (value) => controller,
-                      ),
-                      
-                    );
+      child: TextField(
+        
+        onChanged: onChanged,
+        obscureText: obscureText,
+        autofocus: autofocus,
+        controller: controller,
+        decoration: InputDecoration(
+          hintText: hintText,
+          prefixIcon: Icon(prefixIcon),
+          suffixIcon:
+              controller.text.isNotEmpty
+                  ? IconButton(
+                    onPressed: () => controller.clear(),
+                    icon: Icon(Icons.clear),
+                  )
+                  : null,
+          fillColor: Colors.white,
+          filled: true,
+          labelStyle: TextStyle(color: Colors.black),
+          focusedBorder: OutlineInputBorder(),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.grey),
+          ),
+        ),
+        onSubmitted: (value) => controller,
+      ),
+    );
   }
 }
