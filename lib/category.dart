@@ -1,5 +1,8 @@
 import 'package:escape_room/boxStyle.dart';
+import 'package:escape_room/useProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 const List<String> categories = ['인기순', "가격순", "테마별"];
 TextEditingController searchEditingController = TextEditingController();
@@ -12,87 +15,91 @@ class category extends StatefulWidget {
 }
 
 class _categoryState extends State<category> {
-  String selectedCategory = '인기순';
-  String searchQuery = "";
-  late List<Map<String, dynamic>> filteredRooms;
-  @override
-  void initState() {
-    filteredRooms = getFilterRooms();
-    super.initState();
-  }
-
   List<Map<String, dynamic>> escapeRooms = [
     {
-      "name": "공포의 방",
+      "name": "방탈출",
       "price": 25000,
       "popularity": 5,
       "theme": "공포",
       "image": "assets/images/방탈출0.png",
     },
     {
-      "name": "추리의 방",
+      "name": "이스케이프룸",
       "price": 20000,
       "popularity": 4,
       "theme": "추리",
       "image": "assets/images/방탈출1.png",
     },
     {
-      "name": "모험의 방",
+      "name": "전국 방탈출",
       "price": 30000,
       "popularity": 3,
       "theme": "어드벤처",
       "image": "assets/images/방탈출2.png",
     },
     {
-      "name": "스릴의 방",
+      "name": "방탈출고사",
       "price": 35000,
       "popularity": 5,
       "theme": "스릴",
       "image": "assets/images/방탈출3.png",
     },
     {
-      "name": "공포의 방",
+      "name": "인스타 방탈출",
       "price": 18000,
       "popularity": 2,
       "theme": "공포",
       "image": "assets/images/방탈출4.png",
     },
     {
-      "name": "추리의 방",
+      "name": "미로 방탈출",
       "price": 18000,
       "popularity": 1,
       "theme": "추리",
       "image": "assets/images/방탈출5.png",
     },
     {
-      "name": "모험의 방",
+      "name": "큐브 방탈출",
       "price": 18000,
       "popularity": 3,
       "theme": "어드벤처",
       "image": "assets/images/방탈출6.png",
     },
     {
-      "name": "추리의 방",
+      "name": "엑셀 방탈출",
       "price": 18000,
       "popularity": 5,
       "theme": "추리",
       "image": "assets/images/방탈출7.png",
     },
     {
-      "name": "공포의 방",
+      "name": "자물쇠 방탈출",
       "price": 18000,
       "popularity": 5,
       "theme": "공포",
       "image": "assets/images/방탈출8.png",
     },
     {
-      "name": "스릴의 방",
+      "name": "장기밀매",
       "price": 18000,
       "popularity": 2,
       "theme": "스릴",
       "image": "assets/images/방탈출9.png",
     },
   ];
+
+  String selectedCategory = '인기순';
+  String searchQuery = "";
+  bool hover = false;
+  Map<String, bool> favorite = {};
+
+  late List<Map<String, dynamic>> filteredRooms;
+  @override
+  void initState() {
+    filteredRooms = getFilterRooms();
+
+    super.initState();
+  }
 
   //검색하기
   List<Map<String, dynamic>> getFilterRooms() {
@@ -119,6 +126,12 @@ class _categoryState extends State<category> {
     });
   }
 
+  void _favorite(String roomName) {
+    setState(() {
+      favorite[roomName] = !(favorite[roomName] ?? false);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -132,6 +145,7 @@ class _categoryState extends State<category> {
               prefixIcon: Icons.search_rounded,
               controller: searchEditingController,
             ),
+
             SegmentedButton(
               segments:
                   categories
@@ -176,36 +190,61 @@ class _categoryState extends State<category> {
                 childAspectRatio: 0.8,
                 children:
                     getFilterRooms().map((room) {
-                      return ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Stack(
-                          alignment: Alignment.bottomCenter,
-                          children: [
-                            Image.asset(
-                              room["image"],
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
-                            ),
-                            Container(
-                              color: Colors.black,
-                              padding: EdgeInsets.all(5),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    room["name"],
-                                    style: TextStyle(color: Colors.white),
+                      return Consumer<UserProvider>(
+                        builder: (context, userProvider, child) {
+                          bool isFavorite =
+                              userProvider.favorite[room["name"]] ?? false;
+                          return ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Stack(
+                              alignment: Alignment.bottomCenter,
+                              children: [
+                                Image.asset(
+                                  room["image"],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                ),
+                                Positioned(
+                                  bottom: 10,
+                                  child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          "이름: ${room["name"]}",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        Text(
+                                          "가격: ${room["price"]}원",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                  Text(
-                                    "${room["price"]}원",
-                                    style: TextStyle(color: Colors.white),
+                                ),
+                                Positioned(
+                                  right: 0.5,
+                                  child: IconButton(
+                                    onPressed: () {
+                                      userProvider.toggleFavorite(room["name"]);
+                                    },
+                                    icon:
+                                        isFavorite
+                                            ? Icon(
+                                              Icons.favorite,
+                                              color: Colors.pink,
+                                            )
+                                            : Icon(
+                                              Icons.favorite_outline,
+                                              color: Colors.black,
+                                            ),
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       );
                     }).toList(),
               ),

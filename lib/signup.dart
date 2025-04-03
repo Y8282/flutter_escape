@@ -85,10 +85,10 @@ class SignupPage extends StatelessWidget {
                 ),
               ),
 
-              onPressed: () {        
+              onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => hompage()),
+                  MaterialPageRoute(builder: (_) => mainPage()),
                 );
               },
               child: Text(
