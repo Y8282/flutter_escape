@@ -15,108 +15,31 @@ class category extends StatefulWidget {
 }
 
 class _categoryState extends State<category> {
-  List<Map<String, dynamic>> escapeRooms = [
-    {
-      "name": "방탈출",
-      "price": 25000,
-      "popularity": 5,
-      "theme": "공포",
-      "image": "assets/images/방탈출0.png",
-    },
-    {
-      "name": "이스케이프룸",
-      "price": 20000,
-      "popularity": 4,
-      "theme": "추리",
-      "image": "assets/images/방탈출1.png",
-    },
-    {
-      "name": "전국 방탈출",
-      "price": 30000,
-      "popularity": 3,
-      "theme": "어드벤처",
-      "image": "assets/images/방탈출2.png",
-    },
-    {
-      "name": "방탈출고사",
-      "price": 35000,
-      "popularity": 5,
-      "theme": "스릴",
-      "image": "assets/images/방탈출3.png",
-    },
-    {
-      "name": "인스타 방탈출",
-      "price": 18000,
-      "popularity": 2,
-      "theme": "공포",
-      "image": "assets/images/방탈출4.png",
-    },
-    {
-      "name": "미로 방탈출",
-      "price": 18000,
-      "popularity": 1,
-      "theme": "추리",
-      "image": "assets/images/방탈출5.png",
-    },
-    {
-      "name": "큐브 방탈출",
-      "price": 18000,
-      "popularity": 3,
-      "theme": "어드벤처",
-      "image": "assets/images/방탈출6.png",
-    },
-    {
-      "name": "엑셀 방탈출",
-      "price": 18000,
-      "popularity": 5,
-      "theme": "추리",
-      "image": "assets/images/방탈출7.png",
-    },
-    {
-      "name": "자물쇠 방탈출",
-      "price": 18000,
-      "popularity": 5,
-      "theme": "공포",
-      "image": "assets/images/방탈출8.png",
-    },
-    {
-      "name": "장기밀매",
-      "price": 18000,
-      "popularity": 2,
-      "theme": "스릴",
-      "image": "assets/images/방탈출9.png",
-    },
-  ];
-
   String selectedCategory = '인기순';
   String searchQuery = "";
   bool hover = false;
   Map<String, bool> favorite = {};
 
-  late List<Map<String, dynamic>> filteredRooms;
+  late List<Room> filteredRooms;
   @override
   void initState() {
     filteredRooms = getFilterRooms();
-
     super.initState();
   }
 
-  //검색하기
-  List<Map<String, dynamic>> getFilterRooms() {
-    List<Map<String, dynamic>> filterRooms =
-        escapeRooms
-            .where((room) => room["name"].contains(searchQuery))
-            .toList();
+  List<Room> getFilterRooms() {
+    List<Room> filtered =
+        escapeRooms.where((room) => room.name.contains(searchQuery)).toList();
 
     if (selectedCategory == "가격순") {
-      filterRooms.sort((a, b) => a["price"].compareTo(b["price"]));
+      filtered.sort((a, b) => a.price.compareTo(b.price));
     } else if (selectedCategory == "인기순") {
-      filterRooms.sort((a, b) => b["popularity"].compareTo(a["popularity"]));
+      filtered.sort((a, b) => a.popularity.compareTo(b.popularity));
     } else if (selectedCategory == "테마별") {
-      filterRooms.sort((a, b) => a["theme"].compareTo(b["theme"]));
+      filtered.sort((a, b) => a.theme.compareTo(b.theme));
     }
 
-    return filterRooms;
+    return filtered;
   }
 
   void _onSearchChanged(String value) {
@@ -193,14 +116,14 @@ class _categoryState extends State<category> {
                       return Consumer<UserProvider>(
                         builder: (context, userProvider, child) {
                           bool isFavorite =
-                              userProvider.favorite[room["name"]] ?? false;
+                              userProvider.favorite[room.name] ?? false;
                           return ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: Stack(
                               alignment: Alignment.bottomCenter,
                               children: [
                                 Image.asset(
-                                  room["image"],
+                                  (room.image),
                                   fit: BoxFit.cover,
                                   width: double.infinity,
                                   height: double.infinity,
@@ -212,11 +135,11 @@ class _categoryState extends State<category> {
                                     child: Column(
                                       children: [
                                         Text(
-                                          "이름: ${room["name"]}",
+                                          "이름: ${room.name}",
                                           style: TextStyle(color: Colors.white),
                                         ),
                                         Text(
-                                          "가격: ${room["price"]}원",
+                                          "가격: ${room.price}원",
                                           style: TextStyle(color: Colors.white),
                                         ),
                                       ],
@@ -227,7 +150,14 @@ class _categoryState extends State<category> {
                                   right: 0.5,
                                   child: IconButton(
                                     onPressed: () {
-                                      userProvider.toggleFavorite(room["name"]);
+                                      final roomObj = Room(
+                                        name: room.name,
+                                        price: room.price,
+                                        popularity: room.popularity,
+                                        theme: room.theme,
+                                        image: room.image,
+                                      );
+                                      userProvider.toggleFavorite(roomObj);
                                     },
                                     icon:
                                         isFavorite

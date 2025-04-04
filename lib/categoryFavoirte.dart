@@ -10,11 +10,23 @@ class categoryFavorite extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
+        final favoriteRooms = userProvider.favoriteCategories;
+
+        if(favoriteRooms.isEmpty){
+          return Scaffold(
+            body: Center(
+              child: Text("즐겨찾기한 방탈출이 없습니다"),
+            ),
+          );
+        }
         return Scaffold(
           body: (ListView.builder(
             itemCount: userProvider.favoriteCategories.length,
             itemBuilder: (context, index) {
-              Text("hi");
+              final room = favoriteRooms[index];
+              return ListTile(
+                leading: Image.asset(room.image,width: 50,height: 50,),
+              );
             },
           )),
         );
